@@ -15,20 +15,30 @@ shinyUI(navbarPage("Energy Production in DPRK (North Korea)", id = "nav",
                                    br(),
                                    br())
                             ) ,
-                            # fluidRow(
-                            #   column(6,
-                            #          h3("country 3"),
-                            #          br(),
-                            #          br()),
-                            #   column(6,
-                            #          h3("country 4"),
-                            #          br(),
-                            #          br())
-                            # ),
+                            
+                            fluidRow(
+                              shiny::column(10, offset = 4,
+                                            sliderInput("yearProduction", "Choose a year:",
+                                                        min = 1990, max = 2014, value = 2014,
+                                                        animate = TRUE, sep = "")
+                              )
+                            ),
+                            
+                            fluidRow(
+                              column(6,
+                                     plotOutput("growthDPRK"),
+                                     br(),
+                                     br()),
+                              column(6,
+                                     plotOutput("growthSK"),
+                                     br(),
+                                     br())
+                            ),
+                            
                             fluidRow(
                                   shiny::column(10, offset = 4,
-                                                sliderInput("year", "Choose a year:",
-                                                            min = 1990, max = 2014, value = 2014,
+                                                sliderInput("yearGrowth", "Choose a year:",
+                                                            min = 1991, max = 2014, value = 2014,
                                                             animate = TRUE, sep = "")
                                   )
                                 ),
