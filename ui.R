@@ -1,57 +1,104 @@
 library(shiny)
 library(leaflet)
-#Version 2: Add an extra plot
-shinyUI(navbarPage("Energy Production in DPRK (North Korea)", id = "nav",
 
+# Version 3: bar plots of productions of 4 countries
+shinyUI(navbarPage("Comparison of Energy Production in 4 Countries", id = "nav",
+                   
                    tabPanel("Bar Plot",
                             div(class = "outer",
-                            fluidRow(
-                            column(6,
-                                   plotOutput("barDPRK"),
-                                   br(),
-                                   br()),
-                            column(6,
-                                   plotOutput("barSK"),
-                                   br(),
-                                   br())
-                            ) ,
-                            
-                            fluidRow(
-                              shiny::column(10, offset = 4,
-                                            sliderInput("yearProduction", "Choose a year:",
-                                                        min = 1990, max = 2014, value = 2014,
-                                                        animate = TRUE, sep = "")
-                              )
-                            ),
-                            
-                            fluidRow(
-                              column(6,
-                                     plotOutput("growthDPRK"),
-                                     br(),
-                                     br()),
-                              column(6,
-                                     plotOutput("growthSK"),
-                                     br(),
-                                     br())
-                            ),
-                            
-                            fluidRow(
+                                fluidRow(
+                                  column(6,
+                                         plotOutput("barDPRK", height = 275),
+                                         br(),
+                                         br()),
+                                  column(6,
+                                         plotOutput("barSK", height = 275),
+                                         br(),
+                                         br())
+                                ) ,
+                                
+                                fluidRow(
+                                  column(6,
+                                         plotOutput("barUS", height = 275),
+                                         br(),
+                                         br()) ,
+                                  column(6,
+                                         plotOutput("barChina", height = 275),
+                                         br(),
+                                         br())
+                                ) ,
+                                
+                                fluidRow(
                                   shiny::column(10, offset = 4,
-                                                sliderInput("yearGrowth", "Choose a year:",
-                                                            min = 1991, max = 2014, value = 2014,
+                                                sliderInput("yearProduction", "Choose a year:",
+                                                            min = 1990, max = 2014, value = 2014,
                                                             animate = TRUE, sep = "")
                                   )
                                 ),
+                                
                                 tags$div(id = "cite",
                                          strong("Data source:"),
                                          tags$em("International Energy Agency (http://www.iea.org/statistics/) and 
                                                  World Development Indicators (data.worldbank.org).",
                                                  "Please send questions and comments to author Giang Rudderham (giang.rudderham@gmail.com)")
                                 )
-                            )
+                                )
                             )
                    )
 )
+
+#Version 2: Add an extra plot
+# shinyUI(navbarPage("Energy Production in DPRK (North Korea)", id = "nav",
+# 
+#                    tabPanel("Bar Plot",
+#                             div(class = "outer",
+#                             fluidRow(
+#                             column(6,
+#                                    plotOutput("barDPRK"),
+#                                    br(),
+#                                    br()),
+#                             column(6,
+#                                    plotOutput("barSK"),
+#                                    br(),
+#                                    br())
+#                             ) ,
+#                             
+#                             fluidRow(
+#                               shiny::column(10, offset = 4,
+#                                             sliderInput("yearProduction", "Choose a year:",
+#                                                         min = 1990, max = 2014, value = 2014,
+#                                                         animate = TRUE, sep = "")
+#                               )
+#                             ),
+#                             
+#                             fluidRow(
+#                               column(6,
+#                                      plotOutput("growthDPRK"),
+#                                      br(),
+#                                      br()),
+#                               column(6,
+#                                      plotOutput("growthSK"),
+#                                      br(),
+#                                      br())
+#                             ),
+#                             
+#                             fluidRow(
+#                                   shiny::column(10, offset = 4,
+#                                                 sliderInput("yearGrowth", "Choose a year:",
+#                                                             min = 1991, max = 2014, value = 2014,
+#                                                             animate = TRUE, sep = "")
+#                                   )
+#                                 ),
+#                                 tags$div(id = "cite",
+#                                          strong("Data source:"),
+#                                          tags$em("International Energy Agency (http://www.iea.org/statistics/) and 
+#                                                  World Development Indicators (data.worldbank.org).",
+#                                                  "Please send questions and comments to author Giang Rudderham (giang.rudderham@gmail.com)")
+#                                 )
+#                             )
+#                             )
+#                    )
+# )
 
 # Version 1
 # shinyUI(navbarPage("Energy Production in DPRK (North Korea)", id = "nav",
