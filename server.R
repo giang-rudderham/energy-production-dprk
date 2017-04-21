@@ -4,9 +4,10 @@ library(leaflet)
 library(ggplot2) # for barplot
 library(stringr) # for str_wrap function
 
+# Version 3: allow choosing countries to display
+###############################
 #read data
-productDPRK <- read.csv(file = "electricity-production-northkorea.csv",
-                        stringsAsFactors = F)
+productDPRK <- read.csv(file = "electricity-production-northkorea.csv", stringsAsFactors = F)
 popDPRK <- read.csv(file = "population-northkorea.csv")
 
 productSK <- read.csv(file = "electricity-production-southkorea.csv")
@@ -20,69 +21,51 @@ popChina <- read.csv(file = "population-china.csv")
 
 source("helpers.R")
 
-# calculate data on electricity production per capita
-pcDPRK <- perCapita(productDPRK, popDPRK)
-pcSK <- perCapita(productSK, popSK)
-pcUS <- perCapita(productUS, popUS)
-pcChina <- perCapita(productChina, popChina)
+# calculate data on electricity production per capita. Add a column for country names
+pcDPRK <- cbind(country = "North Korea", perCapita(productDPRK, popDPRK))
+pcSK <- cbind(country = "South Korea", perCapita(productSK, popSK))
+pcUS <- cbind(country = "U.S.", perCapita(productUS, popUS))
+pcChina <- cbind(country = "China", perCapita(productChina, popChina))
+
+# merge data of all 4 countries
+merged_data <- rbind(pcDPRK, pcChina, pcSK, pcUS)
 
 shinyServer(function(input, output) {
   
   chosen_year <- reactive({
-    paste0("X", input$yearProduction)
+    paste0("X", input$year)
   })
   
-  output$barDPRK <- renderPlot({
-    #chosen_year <- paste0("X", input$yearProduction)
+  df_reactive <- eventReactive(input$checkGroup, {
+    merged_data[merged_data$country %in% input$checkGroup, ]
+  }) 
   
-    ggplot(data = pcDPRK, aes(x = Fuel, y = pcDPRK[[chosen_year()]])) +
-      geom_bar(stat = "identity", fill = "#8c564b") +
-      geom_text(aes(label = pcDPRK[[chosen_year()]]), vjust = -0.3, size = 3.5) + #display y values on bars
-      labs(title = "Electricity Production Per Capita by Fuel in DPRK, 1990-2014", 
-           y = "Electricity Production (kWh) Per Capita") +
-      theme_minimal() +
-      scale_x_discrete(labels = function(x) str_wrap(x, width = 10)) + #wrap x var names
-      ylim(0, 8000) #so that all bar plots have the same y axis
-      
-  })
-  
-  output$barSK <- renderPlot({
-    #chosen_year <- paste0("X", input$yearProduction)
+  output$bar <- renderPlot({
+    ggplot(data = df_reactive(), aes(x = Fuel, y = df_reactive()[[chosen_year()]], fill = country)) +
+      # position_dodge creates grouped bar plot instead of stacked bar plot
+      geom_bar(stat = "identity", position = position_dodge(), width = 0.7) + 
+      # specify colors for the "fill" variable earlier
+      scale_fill_manual(values = c("North Korea" = "#ca0020", "South Korea" = "#92c5de",
+                                   "China" = "#f4a582", "U.S." = "#0571b0")) +
+      # wrap x var names
+      scale_x_discrete(labels = function(x) str_wrap(x, width = 10)) +
+      # specify legend title, given by "fill" variable earlier
+      labs(title = "Electricity Production (kWh) Per Capita by Fuel, 1990-2014",
+           fill = "Country") +
+      # make sure all plots for all years have the same y axis scale
+      ylim(0, max(df_reactive()[ , 3:ncol(df_reactive())])) +
+      theme_minimal() + 
+      # remove x axis title, grid lines and y axis. Change x axis text and legend title to bold.
+      theme(#axis.line.y = element_blank(),
+        #axis.ticks.y = element_blank(),
+        axis.title.y = element_blank(),
+        #axis.text.y = element_blank(),
+        axis.title.x = element_blank(),
+        axis.text.x = element_text(face = "bold"),
+        #panel.grid = element_blank(),
+        legend.title = element_text(size = 12, face = "bold"))
     
-    ggplot(data = pcSK, aes(x = Fuel, y = pcSK[[chosen_year()]])) +
-      geom_bar(stat = "identity", fill = "#595959") +
-      geom_text(aes(label = pcSK[[chosen_year()]]), vjust = -0.3, size = 3.5) + #display y values on bars
-      labs(title = "Electricity Production Per Capita by Fuel in South Korea, 1990-2014", 
-           y = "Electricity Production (kWh) Per capita") +
-      theme_minimal() +
-      scale_x_discrete(labels = function(x) str_wrap(x, width = 10)) + #wrap x var names
-      ylim(0, 8000) #so that all bar plots have the same y axis
   })
-  
-  output$barUS <- renderPlot({
-    #chosen_year <- paste0("X", input$yearProduction)
-    
-    ggplot(data = pcUS, aes(x = Fuel, y = pcUS[[chosen_year()]])) +
-      geom_bar(stat = "identity", fill = "#006ba4") +
-      geom_text(aes(label = pcUS[[chosen_year()]]), vjust = -0.3, size = 3.5) + #display y values on bars
-      labs(title = "Electricity Production Per Capita by Fuel in the U.S., 1990-2014", 
-           y = "Electricity Production (kWh) Per capita") +
-      theme_minimal() +
-      scale_x_discrete(labels = function(x) str_wrap(x, width = 10)) + #wrap x var names
-      ylim(0, 8000) #so that all bar plots have the same y axis
-  })
-  
-  output$barChina <- renderPlot({
-    #chosen_year <- paste0("X", input$yearProduction)
-    
-    ggplot(data = pcChina, aes(x = Fuel, y = pcChina[[chosen_year()]])) +
-      geom_bar(stat = "identity", fill = "#c85200") +
-      geom_text(aes(label = pcChina[[chosen_year()]]), vjust = -0.3, size = 3.5) + #display y values on bars
-      labs(title = "Electricity Production Per Capita by Fuel in China, 1990-2014", 
-           y = "Electricity Production (kWh) Per capita") +
-      theme_minimal() +
-      scale_x_discrete(labels = function(x) str_wrap(x, width = 10)) + #wrap x var names
-      ylim(0, 8000) #so that all bar plots have the same y axis
-  })
+
   
 })
