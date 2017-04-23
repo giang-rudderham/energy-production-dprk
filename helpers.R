@@ -1,3 +1,5 @@
+library(RColorBrewer) # for colorRampPalette
+
 # function to calculate electricity production per capita
 # df1 has electricity production, df2 has population data
 
@@ -22,3 +24,6 @@ perCapita <- function(df1, df2){
   
   df3
 }
+
+# function to build palettes with arbitrary number of colors, based on 8 colors of palette Set1
+get_palette <- colorRampPalette(brewer.pal(8, "Set1"))
