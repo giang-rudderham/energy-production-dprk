@@ -1,13 +1,16 @@
 library(shiny)
 library(leaflet)
-# V.4: grouped bar plot
-#############################
+library(plotly) # for plotlyOutput
+
+# version 5: modify v.4. to enable text when hovering on bar + panning + zoomming
+# change plotOutput to plotlyOutput
+#########################
 shinyUI(navbarPage("Comparison of Energy Production in 4 Countries", id = "nav",
                    
                    tabPanel("Bar Plot",
                             div(class = "outer",
                                 fluidRow(
-                                  plotOutput("bar")
+                                  plotlyOutput("bar")
                                 ) ,
                                 
                                 hr(),
@@ -22,7 +25,7 @@ shinyUI(navbarPage("Comparison of Energy Production in 4 Countries", id = "nav",
                                                                            "China" = "China",
                                                                            "South Korea" = "South Korea", 
                                                                            "U.S." = "U.S."
-                                                                           ),
+                                                            ),
                                                             selected = "North Korea")
                                   ),
                                   column(9, 
@@ -30,7 +33,10 @@ shinyUI(navbarPage("Comparison of Energy Production in 4 Countries", id = "nav",
                                                      min = 1990, max = 2014, value = 2014,
                                                      animate = TRUE, sep = "")
                                   )
-                                ),
+                                ) ,
+                                
+                                hr(),
+                                
                                 
                                 tags$div(id = "cite",
                                          strong("Data source:"),
@@ -38,7 +44,7 @@ shinyUI(navbarPage("Comparison of Energy Production in 4 Countries", id = "nav",
                                                  World Development Indicators (data.worldbank.org).",
                                                  "Please send questions and comments to author Giang Rudderham (giang.rudderham@gmail.com)")
                                 )
+                                )
                             )
                    )
-)
 )
