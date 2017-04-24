@@ -3,9 +3,11 @@ library(rgdal) # for readOGR function
 library(leaflet)
 library(ggplot2) # for barplot
 library(stringr) # for str_wrap function
+library(plotly) # for renderPlotly
 
-# Version 3: allow choosing countries to display
-###############################
+# version 5: modify v.4. to enable text when hovering on bar + panning + zoomming
+# change renderPlot to renderPlotly and use ggplotly function after calling ggplot
+#########################
 #read data
 productDPRK <- read.csv(file = "electricity-production-northkorea.csv", stringsAsFactors = F)
 popDPRK <- read.csv(file = "population-northkorea.csv")
@@ -40,13 +42,20 @@ shinyServer(function(input, output) {
     merged_data[merged_data$country %in% input$checkGroup, ]
   }) 
   
-  output$bar <- renderPlot({
-    ggplot(data = df_reactive(), aes(x = Fuel, y = df_reactive()[[chosen_year()]], fill = country)) +
+  output$bar <- renderPlotly({
+    # aes(..., text =...) and later ggplotly(p, tooltip = "text") specify the text appears when hovering on the bars.
+    # default texts are x, y and fill
+    # can also use aes(..., text = paste("Value:", ...)) 
+    p <- ggplot(data = df_reactive(), aes(x = Fuel, y = df_reactive()[[chosen_year()]], fill = country, 
+                                     text = df_reactive()[[chosen_year()]])) +
       # position_dodge creates grouped bar plot instead of stacked bar plot
       geom_bar(stat = "identity", position = position_dodge(), width = 0.7) + 
       # specify colors for the "fill" variable earlier
       scale_fill_manual(values = c("North Korea" = "#ca0020", "South Korea" = "#92c5de",
                                    "China" = "#f4a582", "U.S." = "#0571b0")) +
+      # display y values on bars
+      # geom_text(aes(label = df_reactive()[[chosen_year()]]), vjust = -0.3, size = 3, position = position_dodge(0.7)) + 
+      
       # wrap x var names
       scale_x_discrete(labels = function(x) str_wrap(x, width = 10)) +
       # specify legend title, given by "fill" variable earlier
@@ -61,11 +70,14 @@ shinyServer(function(input, output) {
         axis.title.y = element_blank(),
         #axis.text.y = element_blank(),
         axis.title.x = element_blank(),
-        axis.text.x = element_text(face = "bold"),
+        axis.text.x = element_text(size = 13, face = "bold"),
         #panel.grid = element_blank(),
-        legend.title = element_text(size = 12, face = "bold"))
+        legend.title = element_text(size = 14, face = "bold"),
+        legend.text = element_text(size = 13),
+        plot.title = element_text(size = 16, face = "bold")
+      )
     
+    ggplotly(p, tooltip = "text")
   })
-
   
 })
