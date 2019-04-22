@@ -1,2 +1,4 @@
 # energy-production-dprk
-Visualization of energy production in North Korea
+Interactive visualization of energy production in North Korea, China, South Korea, and the US
+
+Direct link to interactive data visualization: https://gnguyen.shinyapps.io/electricity-production-dprk/
